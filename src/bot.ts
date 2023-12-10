@@ -185,13 +185,13 @@ bot.command("start", replyWithIntro);
 bot.on("message", replyWithIntro);
 
 // Start the server
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "development") {
   // Use Webhooks for the production server
   const app = e();
   app.use(json());
   app.use(webhookCallback(bot, "express"));
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT;
   app.listen(PORT, () => {
     console.log(`Bot listening on port ${PORT}`);
   });
