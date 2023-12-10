@@ -1,9 +1,10 @@
 import { Bot, InlineKeyboard, webhookCallback } from "grammy";
 import { chunk } from "lodash";
-import express from "express";
+import  "express";
 import { applyTextEffect, Variant } from "./textEffects";
 
 import type { Variant as TextEffectVariant } from "./textEffects";
+import e, { json } from "express";
 
 // Create a bot using the Telegram token
 const bot = new Bot(process.env.TELEGRAM_TOKEN || "");
@@ -101,13 +102,13 @@ bot.inlineQuery(queryRegEx, async (ctx) => {
   const fullQueryMatch = fullQuery.match(queryRegEx);
   if (!fullQueryMatch) return;
 
-  const effectLabel = fullQueryMatch[1];
-  const originalText = fullQueryMatch[2];
+  var String, effectLabel = fullQueryMatch[1];
+  var String, originalText = fullQueryMatch[2];
 
   const effectCode = allEffects.find(
-    (effect) => effect.label.toLowerCase() === effectLabel.toLowerCase()
+    (effect) => effect.label.toLowerCase() === effectLabel?.toLowerCase()
   )?.code;
-  const modifiedText = applyTextEffect(originalText, effectCode as Variant);
+  const modifiedText = applyTextEffect(originalText!, effectCode as Variant);
 
   await ctx.answerInlineQuery(
     [
@@ -186,8 +187,8 @@ bot.on("message", replyWithIntro);
 // Start the server
 if (process.env.NODE_ENV === "production") {
   // Use Webhooks for the production server
-  const app = express();
-  app.use(express.json());
+  const app = e();
+  app.use(json());
   app.use(webhookCallback(bot, "express"));
 
   const PORT = process.env.PORT || 3000;
