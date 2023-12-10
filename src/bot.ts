@@ -7,10 +7,55 @@ import type { Variant as TextEffectVariant } from "./textEffects";
 import e, { json } from "express";
 
 // Create a bot using the Telegram token
-const bot = new Bot(process.env.TELEGRAM_TOKEN);
+const bot = new Bot(process.env.TELEGRAM_TOKEN || "");
 
 // Handle the /yo command to greet the user
 bot.command("yo", (ctx) => ctx.reply(`Yo ${ctx.from?.username}`));
+bot.command("hearts", (ctx) => gameStart(ctx, "черви"));
+bot.command("clubs", (ctx) => gameStart(ctx, "крести"));
+bot.command("spades", (ctx) => gameStart(ctx, "пики"));
+bot.command("diamonds", (ctx) => gameStart(ctx, "бубны"));
+
+
+bot.command("bet", (ctx) => {
+  ctx.reply(`Make your bet ${ctx.from?.username}`);
+  
+  return ctx.reply(`Make your bet ${ctx.from?.username}`);
+});
+
+const genrateRandomNumber = (min: number, max: number) => {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min; 
+}
+
+
+
+const gameStart = (ctx: any, betString: string) => {
+   const a = genrateRandomNumber( 1,  4);
+   var resultOF : string;
+   switch ( a ) {
+    case 1:
+      resultOF = "черви"
+        break;
+    case 2:
+      resultOF = "крести"
+        break;
+    case 3:
+      resultOF = "пики"
+        break;
+    default: 
+    resultOF = "бубны"
+        break;
+   }
+    var  isWon: boolean = false;
+   if (betString === resultOF) {
+      isWon = true;
+   }
+
+  
+  ctx.reply((isWon? "Вы Выиграли!": " Вы проиграли") + `  Выпали ${resultOF}` );
+}
 
 // Handle the /effect command to apply text effects using an inline keyboard
 type Effect = { code: TextEffectVariant; label: string };
@@ -161,15 +206,16 @@ const aboutUrlKeyboard = new InlineKeyboard().url(
 // Suggest commands in the menu
 bot.api.setMyCommands([
   { command: "yo", description: "Be greeted by the bot" },
-  {
-    command: "effect",
-    description: "Apply text effects on the text. (usage: /effect [text])",
-  },
+  {command: "bet", description: "Make a bet"},
+  {command: "hearts", description: "Ставка на то что выпадут червы" },
+  {command: "clubs", description: "Ставка на то, что выпадут крести"},
+  {command: "spades", description: "Ставка на то, что выпадут пики"},
+  {command: "diamonds", description: "Ставка на то, что выпадут бубны"},
 ]);
 
 // Handle all other messages and the /start command
-const introductionMessage = `Hello! I'm a Telegram bot.
-I'm powered by Cyclic, the next-generation serverless computing platform.
+const introductionMessage = `Привет. тут ты можешь делать ставки на карты. и заработывать криптовалюту.
+  Скоро выйдет прилодение с Китайским покером. Тут будет ссылка для скачивания.
 
 <b>Commands</b>
 /yo - Be greeted by me
@@ -180,6 +226,8 @@ const replyWithIntro = (ctx: any) =>
     reply_markup: aboutUrlKeyboard,
     parse_mode: "HTML",
   });
+
+
 
 bot.command("start", replyWithIntro);
 bot.on("message", replyWithIntro);
